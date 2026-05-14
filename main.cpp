@@ -18,7 +18,7 @@ int main() {
 	if (cube.loadFromFile("cube.png")) {
 		rectangle.setTexture(&cube);
 	}
-	sf::RectangleShape ground({ 1920, 160 });
+	sf::RectangleShape ground({ 1920, 200});
 	ground.setPosition({ 0, 1000 });
 	ground.setFillColor(sf::Color::Green);
 	sf::Clock clock;
@@ -46,6 +46,9 @@ int main() {
 		else { 
 			movement.y = 0;
 			rectangle.setPosition({rectangle.getPosition().x, ground.getPosition().y - rectangle.getSize().y});
+			for (int i = 0; i < pads.size(); i++) {
+				pads[i].setAlpha(255);
+			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
 			for (int i = 0; i < pads.size(); i++) {
@@ -53,9 +56,11 @@ int main() {
 				if (distance <= 50.f && !pads[i].getUsed()) {
 					movement.y = -1000;
 					pads[i].setUsed(true);
+					pads[i].setAlpha(50);
 					for (int j = 0; j < pads.size(); j++) {
 						if (j != i) {
 							pads[j].setUsed(false);
+							pads[j].setAlpha(255);
 						}
 					}
 				}
@@ -64,10 +69,15 @@ int main() {
 				movement.y = -1000;
 				for (int i = 0; i < pads.size(); i++) {
 					pads[i].setUsed(false);
+					pads[i].setAlpha(255);
 				}
 			}
 		}
 		rectangle.move(movement * deltaTime);
+		if (rectangle.getPosition().x < 0)
+			rectangle.setPosition({ 0, rectangle.getPosition().y });
+		else if (rectangle.getPosition().x > window.getSize().x - rectangle.getSize().x)
+			rectangle.setPosition({ window.getSize().x - rectangle.getSize().x, rectangle.getPosition().y });
 		window.clear(sf::Color(135, 206, 235));
 		for (int i = 0; i < pads.size(); i++) {
 			window.draw(pads[i].getShape());
