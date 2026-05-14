@@ -1,5 +1,3 @@
-//currently unused because im too lazy to replace everything
-
 #pragma once
 #include <SFML/Graphics.hpp>
 
@@ -27,6 +25,9 @@ namespace sk {
 		}
 		sf::CircleShape& getShape() {
 			return shape;
+		}
+		void setAlpha(std::uint8_t alpha) {
+			shape.setFillColor({ 0, 0, 255, alpha });
 		}
 	};
 }
