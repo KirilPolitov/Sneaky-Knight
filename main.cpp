@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "jumpPad.hpp"
+#include "coin.hpp"
 #include <optional>
 #include <vector>
 
 int main() {
+	srand(time(0));
 	sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(videoMode, "sneaky knight");
 	window.setVerticalSyncEnabled(true);
@@ -14,6 +16,8 @@ int main() {
 	pads.push_back(sk::jumpPad({ 1000, 700 }));
 	pads.push_back(sk::jumpPad({ 700, 450 }));
 	pads.push_back(sk::jumpPad({ 300, 450 }));
+	std::vector <sk::coin> coins;
+	coins.push_back(window);
 	sf::Texture cube;
 	if (cube.loadFromFile("cube.png")) {
 		rectangle.setTexture(&cube);
@@ -24,14 +28,28 @@ int main() {
 	sf::Clock clock;
 	sf::Vector2f movement = { 0, 0 };
 	float gravity = 2000.f;
+	float timeElapsed = 0;
+	int collectedCoins = 0;
 	while (window.isOpen()) {
 		float deltaTime = clock.restart().asSeconds();
+		timeElapsed += deltaTime;
 		while (std::optional<sf::Event> opt = window.pollEvent()) {
 			if (opt->is<sf::Event::Closed>()) {
 				window.close();
 			}
 		}
 		
+		if (timeElapsed > 5) {
+			timeElapsed = 0;
+			coins.push_back(window);
+		}
+		for (int i = 0; i < pads.size(); i++) {
+			float distance = (coins[i].getGlobalCenter() - rectangle.getGlobalBounds().getCenter()).length();
+			if (distance <= 25.f) {
+				collectedCoins++;
+				coins.erase(coins.begin() + i-1);
+			}
+		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
 			movement.x = -600;
 		}
@@ -81,6 +99,9 @@ int main() {
 		window.clear(sf::Color(135, 206, 235));
 		for (int i = 0; i < pads.size(); i++) {
 			window.draw(pads[i].getShape());
+		}
+		for (int i = 0; i < coins.size(); i++) {
+			window.draw(coins[i].getShape());
 		}
 		window.draw(rectangle);
 		window.draw(ground);
