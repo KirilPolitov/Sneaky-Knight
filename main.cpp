@@ -47,7 +47,7 @@ int main() {
 			float distance = (coins[i].getGlobalCenter() - rectangle.getGlobalBounds().getCenter()).length();
 			if (distance <= 25.f) {
 				collectedCoins++;
-				coins.erase(coins.begin() + i-1);
+				coins.erase(coins.begin() + i);
 			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
