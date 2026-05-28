@@ -17,13 +17,13 @@ namespace sk {
 		void setUsed(bool used) {
 			this->used = used;
 		}
-		bool getUsed() {
+		const bool getUsed() const {
 			return used;
 		}
-		sf::Vector2f getGlobalCenter() {
+		const sf::Vector2f getGlobalCenter() const {
 			return shape.getGlobalBounds().getCenter();
 		}
-		sf::CircleShape& getShape() {
+		const sf::CircleShape& getShape() const {
 			return shape;
 		}
 		void setAlpha(std::uint8_t alpha) {

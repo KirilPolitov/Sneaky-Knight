@@ -6,9 +6,11 @@
 namespace sk {
 	class coin {
 		sf::CircleShape shape;
+		float lifetime;
 	public:
 		coin(sf::RenderWindow& window) :
-			shape(25.f) {
+			shape(25.f),
+			lifetime(0.f) {
 			shape.setFillColor(sf::Color::Yellow);
 			shape.setOutlineThickness(2.f);
 			shape.setOutlineColor({ 200, 160, 0 });
@@ -22,12 +24,21 @@ namespace sk {
 			shape.setPosition({ posX, posY });
 		}
 
-		sf::CircleShape& getShape() {
+		const sf::CircleShape& getShape() const {
 			return shape;
 		}
 
-		sf::Vector2f getGlobalCenter() {
+		const sf::Vector2f getGlobalCenter() const {
 			return shape.getGlobalBounds().getCenter();
+		}
+		void addLifetime(float deltaTime) {
+			lifetime += deltaTime;
+		}
+		void setLifetime(float lifetime) {
+			this->lifetime = lifetime;
+		}
+		const float getLifetime() const {
+			return lifetime;
 		}
 	};
 }
