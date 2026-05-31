@@ -6,9 +6,11 @@
 
 int main() {
 	srand(time(0));
+	std::filesystem::path resourcePath = std::filesystem::current_path();
 	sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(videoMode, "sneaky knight");
 	window.setVerticalSyncEnabled(true);
+	sf::RenderTexture ui(videoMode.size);
 	sf::RectangleShape rectangle({ 50, 50 });
 	rectangle.setPosition({ 200, 200 });
 	rectangle.setFillColor(sf::Color::White);
@@ -19,9 +21,15 @@ int main() {
 	std::vector <sk::coin> coins;
 	coins.push_back(window);
 	sf::Texture cube;
-	if (cube.loadFromFile("cube.png")) {
+	if (cube.loadFromFile(resourcePath / "cube.png")) {
 		rectangle.setTexture(&cube);
 	}
+	sf::Font font(resourcePath / "Warpen.ttf");
+	sf::Text counter(font);
+	counter.setString("Coins: 0");
+	counter.setCharacterSize(50);
+	counter.setFillColor(sf::Color::Red);
+	counter.setPosition({ 10, 10 });
 	sf::RectangleShape ground({ 1920, 200});
 	ground.setPosition({ 0, 1000 });
 	ground.setFillColor(sf::Color::Green);
@@ -39,15 +47,21 @@ int main() {
 			}
 		}
 		
-		if (timeElapsed > 5) {
+		if (timeElapsed > 5 && coins.size() < 10) {
 			timeElapsed = 0;
 			coins.push_back(window);
 		}
-		for (int i = 0; i < pads.size(); i++) {
+		for (int i = 0; i < coins.size(); i++) {
 			float distance = (coins[i].getGlobalCenter() - rectangle.getGlobalBounds().getCenter()).length();
+			coins[i].addLifetime(deltaTime);
+			if (coins[i].getLifetime() > 55) {
+				coins.erase(coins.begin() + i);
+				continue;
+			}
 			if (distance <= 25.f) {
 				collectedCoins++;
 				coins.erase(coins.begin() + i);
+				counter.setString("Coins: " + std::to_string(collectedCoins));
 			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
@@ -97,12 +111,17 @@ int main() {
 		else if (rectangle.getPosition().x > window.getSize().x - rectangle.getSize().x)
 			rectangle.setPosition({ window.getSize().x - rectangle.getSize().x, rectangle.getPosition().y });
 		window.clear(sf::Color(135, 206, 235));
+		ui.clear(sf::Color::Transparent);
 		for (int i = 0; i < pads.size(); i++) {
 			window.draw(pads[i].getShape());
 		}
 		for (int i = 0; i < coins.size(); i++) {
 			window.draw(coins[i].getShape());
 		}
+		ui.draw(counter);
+		ui.display();
+		sf::Sprite uiSprite(ui.getTexture());
+		window.draw(uiSprite);
 		window.draw(rectangle);
 		window.draw(ground);
 		window.display();
